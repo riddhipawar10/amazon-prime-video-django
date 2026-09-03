@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+{% block title %}Prime Video - Home{% endblock %}
+{% block content %}
+<header class="navbar">
+  <div class="brand"><span class="prime-word">prime</span><span class="video-word">video</span></div>
+  <nav class="nav-links">
+    <a class="active" href="{% url 'home' %}">Home</a>
+    <a href="#movies">Movies</a>
+    <a href="#tv">TV shows</a>
+    <a href="#sports">Sports</a>
+    <a href="#categories">Categories</a>
+  </nav>
+  <div class="nav-actions">
+    <div class="search-wrap"><span>⌕</span><input id="searchInput" type="search" placeholder="Search" onkeyup="searchMovies()"></div>
+    <button class="language">EN⌄</button>
+    <a href="#" class="user-menu">👤 {{ user.username }} <span>⌄</span></a>
+    <a href="{% url 'logout' %}" class="logout">Sign out</a>
+  </div>
+</header>
+
+<section class="hero" {% if featured %}style="background-image: linear-gradient(90deg, #0f171e 0%, rgba(15,23,30,.93) 30%, rgba(15,23,30,.35) 65%, rgba(15,23,30,.15) 100%), url('{{ featured.bannerUrl }}');"{% endif %}>
+  <div class="hero-content">
+    <div class="hero-kicker">prime</div>
+    {% if featured %}
+      <h1>{{ featured.name }}</h1>
+      <div class="hero-meta"><span>{{ featured.releaseYear }}</span><span>{{ featured.duration }}</span><span>IMDb {{ featured.rating|cut:'/10' }}</span><span class="quality">UHD</span></div>
+      <p>{{ featured.description }}</p>
+      <div class="hero-buttons">
+        <button class="watch-btn" onclick="showMovieFromId('{{ featured.id }}')">▶ Watch now</button>
+        <button class="more-btn" onclick="showMovieFromId('{{ featured.id }}')">ⓘ More info</button>
+      </div>
+    {% else %}
+      <h1>Welcome to Prime Video</h1><p>Add movies from Manage Titles to build your catalog.</p>
+    {% endif %}
+  </div>
+</section>
+
+<main id="movies" class="main-content">
+  <div class="continue-card">
+    <div><span class="small-label">PRIME VIDEO</span><h2>Welcome, {{ user.username }}</h2><p>Explore movies, originals and entertainment for everyone.</p></div>
+    <a class="manage-link" href="{% url 'manage_movies' %}">Manage titles →</a>
+  </div>
+
+  <div id="noResults" class="no-results">No titles found. Try another search.</div>
+  {% for category, items in categories %}
+  <section class="row-section" data-category="{{ category }}">
+    <div class="section-title"><h2>{{ category }}</h2><button onclick="scrollRow(this, 1)">›</button></div>
+    <div class="movie-row">
+      {% for movie in items %}
+      <article class="movie-card" data-name="{{ movie.name|lower }}" data-genre="{{ movie.genre|lower }}" data-director="{{ movie.director|lower }}" data-id="{{ movie.id }}" onclick="showMovie(this)">
+        <img src="{{ movie.bannerUrl }}" alt="{{ movie.name }}" loading="lazy">
+        <div class="card-overlay"><span>▶</span><span>＋</span></div>
+        <div class="prime-badge">prime</div>
+        <div class="card-title">{{ movie.name }}</div>
+      </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endfor %}
+
+  <section id="categories" class="feature-grid">
+    <div><span>PRIME</span><h2>Included with Prime</h2><p>Discover movies and shows available with your Prime membership.</p></div>
+    <div><span>NEW RELEASES</span><h2>Something new to watch</h2><p>Browse the latest additions to your catalog.</p></div>
+    <div><span>MY STUFF</span><h2>Your watchlist</h2><p>Save titles you want to watch later.</p></div>
+  </section>
+</main>
+
+<div id="movieModal" class="modal" onclick="closeOnBackdrop(event)">
+  <button class="modal-close" onclick="closeMovie()">×</button>
+  <div class="modal-content">
+    <div class="modal-video"><iframe id="trailerFrame" src="" allow="autoplay; encrypted-media" allowfullscreen></iframe></div>
+    <div class="modal-details">
+      <span class="prime-badge large">prime</span><h1 id="modalName"></h1>
+      <div class="modal-meta"><span id="modalYear"></span><span id="modalDuration"></span><span id="modalRating"></span><span id="modalGenre"></span></div>
+      <p id="modalDescription"></p>
+      <p class="muted"><strong>Director:</strong> <span id="modalDirector"></span></p>
+      <p class="muted"><strong>Cast:</strong> <span id="modalCast"></span></p>
+      <button id="watchlistBtn" class="watch-btn" onclick="toggleWatchlist()">＋ Add to Watchlist</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const movies = {
+{% for movie in movies %}
+  "{{ movie.id }}": {name: "{{ movie.name|escapejs }}", year: "{{ movie.releaseYear }}", rating: "{{ movie.rating|escapejs }}", duration: "{{ movie.duration|escapejs }}", genre: "{{ movie.genre|escapejs }}", director: "{{ movie.director|escapejs }}", cast: "{{ movie.cast|escapejs }}", description: "{{ movie.description|escapejs }}", trailer: "{{ movie.trailer|escapejs }}"},
+{% endfor %}
+};
+</script>
+{% endblock %}

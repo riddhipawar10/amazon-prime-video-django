@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block title %}Delete Title - Prime Video{% endblock %}
+{% block content %}
+<div class="confirm-page"><div class="confirm-card"><div class="warning-icon">!</div><h1>Delete this title?</h1><p>You are about to permanently remove <strong>{{ movie.name }}</strong> from the catalog.</p><form method="POST">{% csrf_token %}<a class="secondary-btn" href="{% url 'manage_movies' %}">Cancel</a><button class="danger-btn" type="submit">Delete title</button></form></div></div>
+{% endblock %}

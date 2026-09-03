@@ -1,0 +1,6 @@
+{% extends 'base.html' %}
+{% block title %}{{ title }} - Prime Video{% endblock %}
+{% block content %}
+<header class="simple-nav"><a class="brand" href="{% url 'home' %}"><span class="prime-word">prime</span><span class="video-word">video</span></a><a href="{% url 'manage_movies' %}">Manage Titles</a></header>
+<main class="form-page"><div class="form-card"><h1>{{ title }}</h1><p class="muted">Add or update a movie in your Prime Video catalog.</p><form method="POST">{% csrf_token %}{{ form.as_p }}<div class="form-actions"><a class="secondary-btn" href="{% url 'manage_movies' %}">Cancel</a><button class="primary-btn" type="submit">Save title</button></div></form></div></main>
+{% endblock %}
